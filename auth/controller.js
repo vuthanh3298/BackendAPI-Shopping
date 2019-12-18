@@ -14,13 +14,18 @@ module.exports.login = async function(req, res) {
             if (user) {
                 var token = jwt.sign({}, tokenConfig.secret, { algorithm: 'HS256', expiresIn: tokenConfig.expiresIn });
                 return res.json({
-                    token: token
+                    token: token,
+                    user: user._id
                 });
             } else {
-                return res.send('error')
+                return res.json({
+                    message: 'error'
+                })
             }
         }
     } catch (ex) {
-        res.send('error');
+        return res.json({
+            message: 'error'
+        })
     }
 }

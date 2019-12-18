@@ -6,7 +6,7 @@ module.exports.index = async function(req, res) {
     var userid = req.query.user_id;
     var giohangs;
     if (userid) {
-        var giohangs = await GioHang.find();
+        var giohangs = await GioHang.find({ user_id: userid });
         var result = await Promise.all(giohangs.map(async x => {
             var user = await User.find({ _id: x.user_id });
             var sanpham = await SanPham.find({ _id: x.sanPham_id });
@@ -27,19 +27,24 @@ module.exports.index = async function(req, res) {
 }
 
 module.exports.create = async function(req, res) {
-    var giohang = new GioHang({
-        user_id: req.query.user_id,
-        sanPham_id: req.query.sanPham_id,
-        soLuong: req.query.soLuong,
-        thanhTien: req.query.thanhTien,
-        daXuat: req.query.daXuat,
-        hinh: req.query.hinh
-    })
-    var gio_hang = await GioHang.create(giohang);
-    if (gio_hang) {
-        res.send('success');
-    } else {
-        res.send('error');
+    var giohang = req.body;
+    if (giohang) { // nếu đã có sản phẩm thì sửa lại số lượng
+        var result = await GioHang.updateOne({
+            user_id: giohang.user_id,
+            sanPham_id: giohang.sanPham_id,
+            daXuat: false
+        }, { $inc: { soLuong: giohang.soLuong } });
+        if (result.n > 0) {
+            res.send('success');
+        } else {
+            var giohang2 = new GioHang(req.body);
+            var gio_hang = await GioHang.create(giohang2);
+            if (gio_hang) {
+                res.send('success');
+            } else {
+                res.send('error');
+            }
+        }
     }
 }
 
@@ -53,6 +58,16 @@ module.exports.delete = async function(req, res) {
     }
 }
 
-module.exports.update = function(req, res) {
-    //if(req.body.)
+module.exports.update = async function(req, res) {
+    var giohang = req.body;
+    if (giohang) {
+        var id = giohang._id;
+        var sl = giohang.soLuong;
+        var result = await GioHang.updateOne({ _id: id }, { $inc: { soLuong: sl } });
+        if (result.n > 0) {
+            res.send('success');
+        } else {
+            res.send('error');
+        }
+    }
 }
