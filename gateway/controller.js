@@ -2,14 +2,9 @@ const jwt = require('jsonwebtoken');
 const tokenConfig = require('../config').token;
 
 const requestNeedAuthen = [{
-        url: '/giohangs/*',
-        method: 'GET'
-    },
-    {
-        url: '/danhmucs/*',
-        method: 'GET'
-    }
-]
+    url: '/giohangs/*',
+    method: 'GET'
+}]
 
 module.exports.checkAuth = function(req, res, next) {
     const arrRequestNeedAuthen = requestNeedAuthen.find(r => req.path.match(r.url + '$') && r.method === req.method);
