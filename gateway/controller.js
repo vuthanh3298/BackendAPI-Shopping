@@ -33,4 +33,7 @@ module.exports.checkAuth = function(req, res, next) {
             message: 'Unauthorized'
         });
     }
+    return res.status(403).send({
+        message: 'Unauthorized'
+    });
 };
